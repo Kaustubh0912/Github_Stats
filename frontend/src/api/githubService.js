@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+const GITHUB_API_URL = "https://api.github.com";
 
 /**
  * Service for interacting with the GitHub Stats API
@@ -19,13 +20,16 @@ class GitHubService {
         const { data } = await axios.get(`${API_BASE_URL}/github/${username}`);
         return data;
       } catch (backendError) {
-        console.warn('Backend API error, falling back to direct GitHub API:', backendError);
+        console.warn(
+          "Backend API error, falling back to direct GitHub API:",
+          backendError,
+        );
         // Fallback to direct GitHub API
         const { data } = await axios.get(`${GITHUB_API_URL}/users/${username}`);
         return data;
       }
     } catch (error) {
-      console.error('Error fetching GitHub user:', error);
+      console.error("Error fetching GitHub user:", error);
       throw error;
     }
   }
@@ -40,18 +44,26 @@ class GitHubService {
     try {
       try {
         // Try to use our backend first
-        const { data } = await axios.get(`${API_BASE_URL}/github/${username}/repos`);
+        const { data } = await axios.get(
+          `${API_BASE_URL}/github/${username}/repos`,
+        );
         return data;
       } catch (backendError) {
-        console.warn('Backend API error, falling back to direct GitHub API:', backendError);
+        console.warn(
+          "Backend API error, falling back to direct GitHub API:",
+          backendError,
+        );
         // Fallback to direct GitHub API
-        const { data } = await axios.get(`${GITHUB_API_URL}/users/${username}/repos`, {
-          params: { sort: 'updated', per_page: 100 }
-        });
+        const { data } = await axios.get(
+          `${GITHUB_API_URL}/users/${username}/repos`,
+          {
+            params: { sort: "updated", per_page: 100 },
+          },
+        );
         return data;
       }
     } catch (error) {
-      console.error('Error fetching repositories:', error);
+      console.error("Error fetching repositories:", error);
       throw error;
     }
   }
@@ -66,18 +78,26 @@ class GitHubService {
     try {
       try {
         // Try to use our backend first
-        const { data } = await axios.get(`${API_BASE_URL}/github/${username}/activity`);
+        const { data } = await axios.get(
+          `${API_BASE_URL}/github/${username}/activity`,
+        );
         return data;
       } catch (backendError) {
-        console.warn('Backend API error, falling back to direct GitHub API:', backendError);
+        console.warn(
+          "Backend API error, falling back to direct GitHub API:",
+          backendError,
+        );
         // Fallback to direct GitHub API
-        const { data } = await axios.get(`${GITHUB_API_URL}/users/${username}/events/public`, {
-          params: { per_page: 30 }
-        });
+        const { data } = await axios.get(
+          `${GITHUB_API_URL}/users/${username}/events/public`,
+          {
+            params: { per_page: 30 },
+          },
+        );
         return data;
       }
     } catch (error) {
-      console.error('Error fetching activity:', error);
+      console.error("Error fetching activity:", error);
       throw error;
     }
   }
@@ -92,17 +112,24 @@ class GitHubService {
     try {
       try {
         // Try to use our backend first
-        const { data } = await axios.get(`${API_BASE_URL}/github/${username}/languages`);
+        const { data } = await axios.get(
+          `${API_BASE_URL}/github/${username}/languages`,
+        );
         return data;
       } catch (backendError) {
-        console.warn('Backend API error, falling back to direct GitHub API:', backendError);
+        console.warn(
+          "Backend API error, falling back to direct GitHub API:",
+          backendError,
+        );
         // Fallback to direct GitHub API - This is complex to compute client-side
         // Just return a simplified version
-        console.warn('Language stats require backend processing, returning empty array');
+        console.warn(
+          "Language stats require backend processing, returning empty array",
+        );
         return [];
       }
     } catch (error) {
-      console.error('Error fetching languages:', error);
+      console.error("Error fetching languages:", error);
       throw error;
     }
   }
@@ -116,10 +143,13 @@ class GitHubService {
    */
   async getUserDirect(username, headers = {}) {
     try {
-      const { data } = await axios.get(`https://api.github.com/users/${username}`, { headers });
+      const { data } = await axios.get(
+        `https://api.github.com/users/${username}`,
+        { headers },
+      );
       return data;
     } catch (error) {
-      console.error('Error fetching GitHub user directly:', error);
+      console.error("Error fetching GitHub user directly:", error);
       throw error;
     }
   }
