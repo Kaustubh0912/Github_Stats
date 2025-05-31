@@ -8,29 +8,36 @@
     <meta name="keywords" content="GitHub, stats, widget, profile, developer, coding, repositories" />
     <meta name="author" content="GitHub Stats Widget" />
     <title>GitHub Stats Widget</title>
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Theme initialization script -->
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              github: {
-                dark: '#0d1117',
-                light: '#ffffff',
-                accent: '#58a6ff',
-                secondary: '#6e7681',
-                green: '#2ea44f',
-                yellow: '#f1e05a',
-                red: '#f85149',
-                purple: '#8957e5',
-              },
-            },
-          }
-        }
+      // Check for saved theme preference or use system preference
+      const savedTheme = localStorage.getItem('github-stats-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+      
+      // Apply theme immediately to prevent flash
+      document.documentElement.setAttribute('data-theme', initialTheme);
+      
+      // Set dark mode class if needed
+      if (initialTheme === 'dark') {
+        document.documentElement.classList.add('dark');
       }
-    </script>
-    <script>
+      
+      // Theme switching function
+      window.toggleTheme = function() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('github-stats-theme', newTheme);
+        
+        if (newTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      };
+      
       // Check if we're in iframe mode
       if (window.self !== window.top) {
         document.documentElement.classList.add('widget-mode');
@@ -53,9 +60,9 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <!-- Fallback content if React fails to load -->
-    <div id="fallback" style="display:none;" class="p-4 text-center">
-      <h2 class="text-xl font-bold mb-4">GitHub Stats Widget</h2>
-      <p>Loading failed. Please try the <a href="/simple-widget" class="text-blue-500 hover:underline">simple version</a> instead.</p>
+    <div id="fallback" style="display:none;" class="fallback-container">
+      <h2 class="fallback-title">GitHub Stats Widget</h2>
+      <p class="fallback-message">Loading failed. Please try the <a href="/simple-widget" class="fallback-link">simple version</a> instead.</p>
     </div>
     <script>
       // Show fallback content if React doesn't load within 5 seconds

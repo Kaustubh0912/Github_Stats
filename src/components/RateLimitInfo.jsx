@@ -10,31 +10,34 @@ function RateLimitInfo({ rateLimit, theme = 'dark' }) {
   // Determine status color
   let statusColor;
   if (remainingPercent > 50) {
-    statusColor = 'bg-github-green';
+    statusColor = 'var(--color-success)';
   } else if (remainingPercent > 10) {
-    statusColor = 'bg-github-yellow';
+    statusColor = 'var(--color-warning)';
   } else {
-    statusColor = 'bg-github-red';
+    statusColor = 'var(--color-danger)';
   }
   
   // Format reset time
   const resetTime = new Date(rateLimit.reset * 1000).toLocaleTimeString();
   
   return (
-    <div className={`rate-limit-info text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mt-3 p-2 rounded-md ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
-      <div className="flex items-center mb-1 justify-between">
-        <span>GitHub API Rate Limit:</span>
-        <span className="font-mono">{rateLimit.remaining}/{rateLimit.limit}</span>
+    <div className="rate-limit-container">
+      <div className="rate-limit-header">
+        <span className="rate-limit-title">GitHub API Rate Limit:</span>
+        <span className="rate-limit-count">{rateLimit.remaining}/{rateLimit.limit}</span>
       </div>
       
-      <div className="w-full bg-gray-700 rounded-full h-1.5 mb-1">
+      <div className="rate-limit-progress-bg">
         <div 
-          className={`${statusColor} h-1.5 rounded-full`} 
-          style={{ width: `${remainingPercent}%` }}
+          className="rate-limit-progress-bar"
+          style={{ 
+            width: `${remainingPercent}%`,
+            backgroundColor: statusColor
+          }}
         ></div>
       </div>
       
-      <div className="text-xs">
+      <div className="rate-limit-reset">
         Resets at: {resetTime}
       </div>
     </div>

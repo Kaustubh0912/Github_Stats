@@ -3,7 +3,7 @@ import React from 'react';
 function SimpleLanguageChart({ languages, theme = 'dark' }) {
   if (!languages || languages.length === 0) {
     return (
-      <div className="text-center p-4 text-github-secondary">
+      <div className="language-empty-state">
         No language data available
       </div>
     );
@@ -48,18 +48,18 @@ function SimpleLanguageChart({ languages, theme = 'dark' }) {
   };
 
   return (
-    <div className="simple-language-chart">
+    <div className="language-chart-container">
       {/* Bar Chart */}
-      <div className="mb-4">
+      <div className="language-bars">
         {languages.map((lang, idx) => (
-          <div key={idx} className="mb-2">
-            <div className="flex justify-between text-sm mb-1">
-              <span>{lang.name}</span>
-              <span>{lang.percentage.toFixed(1)}%</span>
+          <div key={idx} className="language-bar-item">
+            <div className="language-bar-header">
+              <span className="language-name">{lang.name}</span>
+              <span className="language-percentage">{lang.percentage.toFixed(1)}%</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div className="language-bar">
               <div 
-                className="h-2.5 rounded-full" 
+                className="language-segment" 
                 style={{ 
                   width: `${lang.percentage}%`,
                   backgroundColor: getLanguageColor(lang.name, idx)
@@ -71,14 +71,14 @@ function SimpleLanguageChart({ languages, theme = 'dark' }) {
       </div>
       
       {/* Color Legend */}
-      <div className="flex flex-wrap gap-2 mt-2">
+      <div className="language-legend">
         {languages.map((lang, idx) => (
-          <div key={idx} className="flex items-center">
+          <div key={idx} className="language-legend-item">
             <span 
-              className="inline-block w-3 h-3 rounded-full mr-1" 
+              className="language-color-dot" 
               style={{ backgroundColor: getLanguageColor(lang.name, idx) }}
             ></span>
-            <span className="text-xs text-gray-600 dark:text-gray-300">
+            <span className="language-legend-name">
               {lang.name}
             </span>
           </div>

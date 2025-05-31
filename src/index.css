@@ -2,34 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./styles/theme.css";
+@import "./styles/components.css";
+@import "./styles/pages.css";
+/* Import our custom theme, components and pages styles */
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 @layer components {
-  .stats-card {
-    @apply rounded-lg shadow-md p-4 overflow-hidden transition-all;
-  }
-  
-  .stats-card-dark {
-    @apply bg-github-dark text-white;
-  }
-  
-  .stats-card-light {
-    @apply bg-github-light text-gray-900;
-  }
-  
-  .stats-title {
-    @apply text-xl font-semibold mb-2;
-  }
-  
-  .stats-value {
-    @apply text-lg font-medium;
-  }
-  
-  .github-btn {
-    @apply px-4 py-2 rounded-md transition-colors bg-github-accent text-white hover:bg-opacity-90;
-  }
+    .stats-card {
+        @apply rounded-lg shadow-md p-4 overflow-hidden transition-all;
+        background-color: var(--color-bg-secondary);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border-primary);
+    }
+
+    .stats-card-dark {
+        background-color: var(--color-bg-secondary);
+        color: var(--color-text-primary);
+    }
+
+    .stats-card-light {
+        background-color: var(--color-bg-primary);
+        color: var(--color-text-primary);
+    }
+
+    .stats-title {
+        @apply text-xl font-semibold mb-2;
+        color: var(--color-text-primary);
+    }
+
+    .stats-value {
+        @apply text-lg font-medium;
+        color: var(--color-primary);
+    }
+
+    .github-btn {
+        @apply px-4 py-2 rounded-md transition-colors hover:bg-opacity-90;
+        background-color: var(--color-primary);
+        color: white;
+    }
 }

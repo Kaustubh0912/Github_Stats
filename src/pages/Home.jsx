@@ -6,7 +6,7 @@ function Home() {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState(document.documentElement.getAttribute('data-theme') || 'dark');
   const [widgetAvailable, setWidgetAvailable] = useState(true);
   
   // Check if the widget page is accessible and set username from auth if available
@@ -50,28 +50,28 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      <header className="bg-white dark:bg-github-dark shadow-md">
-        <div className="container mx-auto py-6 px-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">
+    <div className="page-wrapper">
+      <header className="page-header">
+        <div className="header-container">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="page-title">
                 GitHub Stats Widget
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
+              <p className="page-subtitle">
                 Embed GitHub stats for any user on your website
               </p>
             </div>
-            <div>
+            <div className="header-actions">
               {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <span className="block text-sm text-github-accent">Signed in as</span>
-                    <span className="font-medium">{user?.username}</span>
+                <div className="user-auth-display">
+                  <div className="user-info">
+                    <span className="user-label">Signed in as</span>
+                    <span className="user-name">{user?.username}</span>
                   </div>
                   <button 
                     onClick={logout}
-                    className="px-3 py-1 rounded border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+                    className="btn btn-secondary btn-sm"
                   >
                     Logout
                   </button>
@@ -89,33 +89,33 @@ function Home() {
         </div>
       </header>
       
-      <main className="container mx-auto py-8 px-4">
-        <section className="max-w-3xl mx-auto bg-white dark:bg-github-dark rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Generate Your Widget</h2>
+      <main className="page-container">
+        <section className="widget-generator card">
+          <h2 className="section-title">Generate Your Widget</h2>
           
           {isAuthenticated ? (
-            <div className="bg-github-accent/10 border border-github-accent/20 rounded-md p-4 mb-4">
-              <div className="flex items-start">
-                <div className="text-github-accent text-xl mr-3">✓</div>
-                <div>
-                  <h3 className="font-medium">Using Authenticated GitHub Access</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="auth-status-banner auth-success">
+              <div className="banner-content">
+                <div className="banner-icon">✓</div>
+                <div className="banner-text">
+                  <h3 className="banner-title">Using Authenticated GitHub Access</h3>
+                  <p className="banner-description">
                     You're signed in, so your widgets will use authenticated GitHub API access with higher rate limits.
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-md p-4 mb-4">
-              <div className="flex items-start">
-                <div className="text-yellow-500 text-xl mr-3">⚠️</div>
-                <div>
-                  <h3 className="font-medium">Rate Limit Warning</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="auth-status-banner auth-warning">
+              <div className="banner-content">
+                <div className="banner-icon">⚠️</div>
+                <div className="banner-text">
+                  <h3 className="banner-title">Rate Limit Warning</h3>
+                  <p className="banner-description">
                     You're not signed in. GitHub API has a limit of 60 requests per hour for unauthenticated requests.{' '}
                     <button 
                       onClick={() => navigate('/login')}
-                      className="text-github-accent underline"
+                      className="text-link"
                     >
                       Sign in with GitHub
                     </button>{' '}
@@ -126,23 +126,23 @@ function Home() {
             </div>
           )}
           
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium mb-2">
+          <div className="form-group">
+            <label htmlFor="username" className="form-label">
               GitHub Username
             </label>
-            <div className="flex">
+            <div className="input-group">
               <input
                 type="text"
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="e.g., octocat"
-                className="w-full px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-github-accent dark:bg-gray-800 dark:border-gray-700"
+                className="form-input"
               />
               {isAuthenticated && user?.username && (
                 <button
                   onClick={() => setUsername(user.username)}
-                  className="bg-github-accent text-white px-4 py-2 rounded-r-md hover:bg-opacity-90"
+                  className="input-addon-btn"
                   title="Use your GitHub username"
                 >
                   Use Mine
@@ -151,44 +151,54 @@ function Home() {
             </div>
           </div>
           
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">
+          <div className="form-group">
+            <label className="form-label">
               Theme
             </label>
-            <div className="flex space-x-4">
-              <label className="inline-flex items-center">
+            <div className="radio-group">
+              <label className="radio-label">
                 <input
                   type="radio"
-                  className="form-radio text-github-accent"
+                  className="radio-input"
                   name="theme"
                   value="dark"
                   checked={theme === 'dark'}
-                  onChange={() => setTheme('dark')}
+                  onChange={() => {
+                    setTheme('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('github-stats-theme', 'dark');
+                  }}
                 />
-                <span className="ml-2">Dark</span>
+                <span className="radio-text">Dark</span>
               </label>
-              <label className="inline-flex items-center">
+              <label className="radio-label">
                 <input
                   type="radio"
-                  className="form-radio text-github-accent"
+                  className="radio-input"
                   name="theme"
                   value="light"
                   checked={theme === 'light'}
-                  onChange={() => setTheme('light')}
+                  onChange={() => {
+                    setTheme('light');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('github-stats-theme', 'light');
+                  }}
                 />
-                <span className="ml-2">Light</span>
+                <span className="radio-text">Light</span>
               </label>
             </div>
           </div>
           
           {username && (
-            <div className="mb-6">
-              <div className="flex space-x-4">
+            <div className="action-buttons">
+              <div className="button-group">
                 <a
                   href={`/widget?user=${username}&theme=${theme}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="github-btn inline-block"
+                  className="btn btn-primary"
                   onClick={(e) => {
                     // Fallback mechanism in case of issues
                     try {
@@ -204,7 +214,7 @@ function Home() {
                   href={`/simple-widget?user=${username}&theme=${theme}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md"
+                  className="btn btn-secondary"
                   title="Uses fewer API calls to avoid rate limits"
                 >
                   Simple Widget (Fallback)
@@ -214,26 +224,26 @@ function Home() {
           )}
           
           {username && (
-            <div className="mb-4">
-              <h3 className="text-lg font-medium mb-2">Embed Code</h3>
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-md p-4">
-                <pre className="text-sm overflow-x-auto whitespace-pre-wrap">
+            <div className="embed-code-section">
+              <h3 className="section-subtitle">Embed Code</h3>
+              <div className="code-container">
+                <pre className="code-display">
                   {getEmbedCode()}
                 </pre>
               </div>
-              <div className="text-xs text-github-secondary mt-2">
-                <p className="mb-1">Having issues? Try using the Simple Widget URL:</p>
-                <code className="block bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">
+              <div className="info-message">
+                <p className="info-text">Having issues? Try using the Simple Widget URL:</p>
+                <code className="simple-url">
                   {window.location.origin}/simple-widget?user={username}&theme={theme}
                 </code>
-                <p className="mt-1">The Simple Widget uses fewer API calls to avoid rate limits.</p>
+                <p className="info-text-secondary">The Simple Widget uses fewer API calls to avoid rate limits.</p>
               </div>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(getEmbedCode());
                   alert('Embed code copied to clipboard!');
                 }}
-                className="mt-2 text-sm github-btn"
+                className="btn btn-sm btn-primary copy-btn"
               >
                 Copy to Clipboard
               </button>
@@ -241,14 +251,14 @@ function Home() {
           )}
           
           {username && (
-            <div>
-              <h3 className="text-lg font-medium mb-2">Direct Link</h3>
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-md p-4">
+            <div className="direct-link-section">
+              <h3 className="section-subtitle">Direct Link</h3>
+              <div className="link-container">
                 <a 
                   href={getWidgetLink()} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-github-accent break-all"
+                  className="direct-link"
                 >
                   {getWidgetLink()}
                 </a>
@@ -257,51 +267,51 @@ function Home() {
           )}
         </section>
         
-        <section className="max-w-3xl mx-auto bg-white dark:bg-github-dark rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
-          <p className="mb-4">
+        <section className="info-section card">
+          <h2 className="section-title">How It Works</h2>
+          <p className="info-text">
             The GitHub Stats Widget provides a simple way to showcase GitHub profiles and statistics on your website 
             or portfolio. It uses the GitHub API to fetch public data for any username you provide.
           </p>
-          <h3 className="text-xl font-medium mb-2">Features:</h3>
-          <ul className="list-disc pl-5 mb-4 space-y-1">
+          <h3 className="feature-title">Features:</h3>
+          <ul className="feature-list">
             <li>Profile information (avatar, name, bio)</li>
             <li>Account statistics (repos, followers, following)</li>
             <li>Language usage breakdown</li>
             <li>Top repositories by stars</li>
             <li>Recent activity</li>
           </ul>
-          <p className="mb-4">
+          <p className="info-text">
             Simply copy the embed code above and paste it into your HTML to display the widget on your site.
           </p>
           
-          <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4 mt-4 rounded">
-            <h4 className="text-lg font-medium mb-2 text-yellow-800 dark:text-yellow-200">GitHub API Rate Limits</h4>
-            <p className="mb-2 text-sm">
+          <div className="rate-limit-info-banner">
+            <h4 className="rate-limit-title">GitHub API Rate Limits</h4>
+            <p className="rate-limit-text">
               The GitHub API has rate limits for requests:
             </p>
-            <ul className="list-disc pl-5 mb-2 text-sm">
+            <ul className="rate-limit-list">
               <li>For unauthenticated requests: <strong>60 requests per hour</strong></li>
               <li>For authenticated requests: <strong>5,000 requests per hour</strong></li>
             </ul>
-            <p className="text-sm">
+            <p className="rate-limit-text">
               If you encounter rate limit errors, you may need to wait until the limit resets or try the Simple Widget option.
             </p>
           </div>
         </section>
       </main>
       
-      <footer className="bg-white dark:bg-github-dark shadow-md mt-8">
-        <div className="container mx-auto py-4 px-4 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>
+      <footer className="page-footer">
+        <div className="footer-content">
+          <p className="footer-text">
             GitHub Stats Widget uses the public GitHub API. This is not an official GitHub product.
           </p>
-          <p className="mt-2">
+          <p className="footer-links">
             <a 
               href="https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-github-accent hover:underline"
+              className="footer-link"
             >
               Learn more about GitHub API rate limits
             </a>

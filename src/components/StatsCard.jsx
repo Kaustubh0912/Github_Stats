@@ -15,60 +15,60 @@ function StatsCard({ userData }) {
   };
 
   return (
-    <div className="user-profile flex flex-col sm:flex-row items-center sm:items-start gap-4">
+    <div className="profile-card">
       {/* User Avatar */}
-      <div className="avatar-container">
+      <div className="profile-avatar-container">
         <img 
           src={userData.avatar_url} 
           alt={`${userData.login}'s avatar`}
-          className="w-20 h-20 rounded-full border-2 border-github-accent"
+          className="profile-avatar"
         />
       </div>
       
       {/* User Info */}
-      <div className="user-info flex-1">
-        <h2 className="text-xl font-bold flex items-center gap-2">
+      <div className="profile-info">
+        <h2 className="profile-name">
           {userData.name || userData.login}
           {userData.name && (
-            <span className="text-sm font-normal text-github-secondary">
+            <span className="profile-username">
               @{userData.login}
             </span>
           )}
         </h2>
         
         {userData.bio && (
-          <p className="text-sm text-gray-600 dark:text-gray-300 my-1">
+          <p className="profile-bio">
             {userData.bio}
           </p>
         )}
         
         {userData.location && (
-          <p className="text-xs text-github-secondary my-1">
-            📍 {userData.location}
+          <p className="profile-detail">
+            <span className="profile-icon">📍</span> {userData.location}
           </p>
         )}
         
         {userData.created_at && (
-          <p className="text-xs text-github-secondary my-1">
-            🗓️ Joined GitHub on {formatJoinDate(userData.created_at)}
+          <p className="profile-detail">
+            <span className="profile-icon">🗓️</span> Joined GitHub on {formatJoinDate(userData.created_at)}
           </p>
         )}
         
         {/* Stats Grid */}
-        <div className="stats-grid grid grid-cols-3 gap-2 mt-3">
+        <div className="stats-grid">
           <div className="stat-item">
-            <div className="stat-value font-semibold">{userData.public_repos}</div>
-            <div className="stat-label text-xs text-github-secondary">Repos</div>
+            <div className="stat-value">{userData.public_repos}</div>
+            <div className="stat-label">Repos</div>
           </div>
           
           <div className="stat-item">
-            <div className="stat-value font-semibold">{userData.followers}</div>
-            <div className="stat-label text-xs text-github-secondary">Followers</div>
+            <div className="stat-value">{userData.followers}</div>
+            <div className="stat-label">Followers</div>
           </div>
           
           <div className="stat-item">
-            <div className="stat-value font-semibold">{userData.following}</div>
-            <div className="stat-label text-xs text-github-secondary">Following</div>
+            <div className="stat-value">{userData.following}</div>
+            <div className="stat-label">Following</div>
           </div>
         </div>
         
@@ -77,7 +77,7 @@ function StatsCard({ userData }) {
           href={userData.html_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block mt-3 text-sm github-btn"
+          className="profile-link"
         >
           View Profile
         </a>

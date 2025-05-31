@@ -119,16 +119,20 @@ function Widget() {
   }
 
   return (
-    <div className={`stats-card ${theme === 'dark' ? 'stats-card-dark' : 'stats-card-light'} widget-container`}>
+    <div className={`widget-container ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
       <div className="flex flex-col space-y-4">
         {/* User Profile */}
-        <StatsCard userData={userData} />
+        <div className="profile-section">
+          <StatsCard userData={userData} />
+        </div>
         
         {/* Language Stats */}
         {languageData && languageData.length > 0 ? (
           <div className="widget-section">
             <h3 className="stats-title">Top Languages</h3>
-            <SimpleLanguageChart languages={languageData} theme={theme} />
+            <div className="language-chart">
+              <SimpleLanguageChart languages={languageData} theme={theme} />
+            </div>
           </div>
         ) : null}
         
@@ -136,7 +140,9 @@ function Widget() {
         {reposData && reposData.length > 0 ? (
           <div className="widget-section">
             <h3 className="stats-title">Top Repositories</h3>
-            <TopReposList repos={reposData} />
+            <div className="repos-list">
+              <TopReposList repos={reposData} />
+            </div>
           </div>
         ) : null}
         
@@ -144,27 +150,29 @@ function Widget() {
         {activityData && activityData.length > 0 ? (
           <div className="widget-section">
             <h3 className="stats-title">Recent Activity</h3>
-            <RecentActivity activities={activityData} />
+            <div className="activity-list">
+              <RecentActivity activities={activityData} />
+            </div>
           </div>
         ) : error ? (
-          <div className="text-sm text-github-red mt-2">
+          <div className="error-message">
             {error}
           </div>
         ) : null}
         
         {/* Footer with attribution */}
-        <div className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+        <div className="widget-footer">
           <a 
             href="https://github.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:text-github-accent"
+            className="attribution-link"
           >
             Powered by GitHub API
           </a>
           {usingAuthToken && (
-            <div className="text-xs text-github-accent mt-1">
-              Using authenticated GitHub access ✓ (5,000 req/hour)
+            <div className="auth-status">
+              <span className="auth-badge">✓</span> Using authenticated GitHub access (5,000 req/hour)
             </div>
           )}
           {rateLimitInfo && <RateLimitInfo rateLimit={rateLimitInfo} theme={theme} />}
