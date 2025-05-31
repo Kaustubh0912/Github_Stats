@@ -7,8 +7,8 @@ import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const JWT_SECRET = process.env.JWT_SECRET;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 // Configure GitHub OAuth strategy
 passport.use(
@@ -147,7 +147,8 @@ router.get("/status", (req, res) => {
     message: "GitHub authentication service is running",
     clientId: process.env.GITHUB_CLIENT_ID ? "configured" : "missing",
     callbackUrl: process.env.GITHUB_CALLBACK_URL,
-    tokenFormat: "Contains GitHub access_token for authenticated API calls (5,000 req/hour)"
+    tokenFormat:
+      "Contains GitHub access_token for authenticated API calls (5,000 req/hour)",
   });
 });
 
@@ -155,50 +156,52 @@ router.get("/status", (req, res) => {
 router.get("/test-token", (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' });
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
-    
-    const token = authHeader.split(' ')[1];
-    
+
+    const token = authHeader.split(" ")[1];
+
     jwt.verify(token, JWT_SECRET, async (err, decoded) => {
       if (err) {
-        return res.status(401).json({ error: 'Invalid token' });
+        return res.status(401).json({ error: "Invalid token" });
       }
-      
+
       // Get access token from decoded JWT
       const { accessToken } = decoded;
-      
+
       if (!accessToken) {
-        return res.status(400).json({ error: 'No GitHub access token found in JWT' });
+        return res
+          .status(400)
+          .json({ error: "No GitHub access token found in JWT" });
       }
-      
+
       try {
         // Test the GitHub token by fetching rate limit
-        const response = await axios.get('https://api.github.com/rate_limit', {
+        const response = await axios.get("https://api.github.com/rate_limit", {
           headers: {
-            Authorization: `token ${accessToken}`
-          }
+            Authorization: `token ${accessToken}`,
+          },
         });
-        
+
         return res.json({
-          status: 'ok',
+          status: "ok",
           authenticated: true,
           rateLimit: response.data.rate,
-          message: 'GitHub token is valid and working correctly'
+          message: "GitHub token is valid and working correctly",
         });
       } catch (apiError) {
         return res.status(400).json({
-          error: 'GitHub API error',
+          error: "GitHub API error",
           message: apiError.message,
-          details: apiError.response?.data
+          details: apiError.response?.data,
         });
       }
     });
   } catch (error) {
-    console.error('Error testing token:', error);
-    return res.status(500).json({ error: 'Server error' });
+    console.error("Error testing token:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
