@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/github-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="GitHub Stats Widget - Display your GitHub statistics on any website" />
+    <meta name="keywords" content="GitHub, stats, widget, profile, developer, coding, repositories" />
+    <meta name="author" content="GitHub Stats Widget" />
+    <title>GitHub Stats Widget</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              github: {
+                dark: '#0d1117',
+                light: '#ffffff',
+                accent: '#58a6ff',
+                secondary: '#6e7681',
+                green: '#2ea44f',
+                yellow: '#f1e05a',
+                red: '#f85149',
+                purple: '#8957e5',
+              },
+            },
+          }
+        }
+      }
+    </script>
+    <script>
+      // Check if we're in iframe mode
+      if (window.self !== window.top) {
+        document.documentElement.classList.add('widget-mode');
+      }
+      
+      // Polyfill for btoa/atob in older browsers or environments without them
+      if (typeof btoa === 'undefined') {
+        window.btoa = function(str) {
+          return window.Buffer ? Buffer.from(str).toString('base64') : null;
+        };
+      }
+      if (typeof atob === 'undefined') {
+        window.atob = function(base64) {
+          return window.Buffer ? Buffer.from(base64, 'base64').toString() : null;
+        };
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <!-- Fallback content if React fails to load -->
+    <div id="fallback" style="display:none;" class="p-4 text-center">
+      <h2 class="text-xl font-bold mb-4">GitHub Stats Widget</h2>
+      <p>Loading failed. Please try the <a href="/simple-widget" class="text-blue-500 hover:underline">simple version</a> instead.</p>
+    </div>
+    <script>
+      // Show fallback content if React doesn't load within 5 seconds
+      setTimeout(() => {
+        if (!document.getElementById('root').hasChildNodes()) {
+          document.getElementById('fallback').style.display = 'block';
+        }
+      }, 5000);
+    </script>
+  </body>
+</html>

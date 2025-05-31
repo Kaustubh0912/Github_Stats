@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .stats-card {
+    @apply rounded-lg shadow-md p-4 overflow-hidden transition-all;
+  }
+  
+  .stats-card-dark {
+    @apply bg-github-dark text-white;
+  }
+  
+  .stats-card-light {
+    @apply bg-github-light text-gray-900;
+  }
+  
+  .stats-title {
+    @apply text-xl font-semibold mb-2;
+  }
+  
+  .stats-value {
+    @apply text-lg font-medium;
+  }
+  
+  .github-btn {
+    @apply px-4 py-2 rounded-md transition-colors bg-github-accent text-white hover:bg-opacity-90;
+  }
+}
