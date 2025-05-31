@@ -54,11 +54,39 @@
           return window.Buffer ? Buffer.from(base64, 'base64').toString() : null;
         };
       }
+      // Replace lines 57-71 with this:
       if (!window.location.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico)$/) && window.location.pathname !== '/') 
       {
-        // Store the current URL in session storage
+        // Special handling for auth callback
+        if (window.location.pathname === '/auth/callback') {
+          const urlParams = new URLSearchParams(window.location.search);
+          const token = urlParams.get('token');
+          
+          if (token) {
+            // Store the token in localStorage
+            localStorage.setItem("github_stats_token", token);
+            
+            // Try to parse username from token
+            try {
+              const tokenParts = token.split('.');
+              if (tokenParts.length === 3) {
+                const payload = JSON.parse(atob(tokenParts[1]));
+                if (payload && payload.username) {
+                  localStorage.setItem('github_username', payload.username);
+                }
+              }
+            } catch (err) {
+              console.error('Error parsing token:', err);
+            }
+            
+            // Redirect to home page
+            window.location.href = '/';
+            return;
+          }
+        }
+        
+        // For other non-root paths
         sessionStorage.setItem('redirectUrl', window.location.href);
-        // Redirect to the root
         window.location.href = '/';
       }
       
