@@ -18,7 +18,7 @@ function Login() {
 
   const handleLoginClick = () => {
     // Redirect to server's GitHub OAuth route
-    window.location.href = "https://github-stats-p926.onrender.com/api/auth/github";
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/github`;
   };
 
   const handleLogoutClick = () => {
