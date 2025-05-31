@@ -54,6 +54,24 @@
           return window.Buffer ? Buffer.from(base64, 'base64').toString() : null;
         };
       }
+      if (!window.location.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico)$/) && window.location.pathname !== '/') 
+      {
+        // Store the current URL in session storage
+        sessionStorage.setItem('redirectUrl', window.location.href);
+        // Redirect to the root
+        window.location.href = '/';
+      }
+      
+      // On page load, check if there's a stored redirect URL
+      window.addEventListener('DOMContentLoaded', function() 
+      {
+        const redirectUrl = sessionStorage.getItem('redirectUrl');
+        if (redirectUrl) {
+          sessionStorage.removeItem('redirectUrl');
+          // Use history API to update the URL without reloading
+          history.replaceState(null, null, redirectUrl);
+        }
+      });
     </script>
   </head>
   <body>
