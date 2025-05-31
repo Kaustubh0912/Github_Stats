@@ -136,7 +136,7 @@ function Home() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="e.g., octocat"
+                placeholder="e.g., Kaustubh0912"
                 className="form-input"
               />
               {isAuthenticated && user?.username && (
