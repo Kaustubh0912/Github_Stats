@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "postinstall": "npm install chart.js@^4.4.1 react-chartjs-2@^5.2.0 date-fns@^4.1.0"
