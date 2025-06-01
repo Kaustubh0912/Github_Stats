@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import GitHubIcon from '../../components/GitHubIcon';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL
+
 function Login() {
   const [searchParams] = useSearchParams();
   const error = searchParams.get('error');
@@ -18,7 +20,7 @@ function Login() {
 
   const handleLoginClick = () => {
     // Redirect to server's GitHub OAuth route
-    window.location.href = 'http://localhost:3000/api/auth/github';
+    window.location.href = `${API_BASE_URL}/auth/github`;
   };
 
   const handleLogoutClick = () => {
