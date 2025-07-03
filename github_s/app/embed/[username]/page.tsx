@@ -21,6 +21,12 @@ interface EmbedProps {
     stats?: string;
   };
 }
+interface StatItem {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}
+
 
 export async function generateMetadata({
   params,
@@ -149,9 +155,10 @@ export default async function EmbedPage({ params, searchParams }: EmbedProps) {
     },
   };
 
-  const visibleStats = statsToShow
-    .map((key: string) => statItems[key as keyof typeof statItems])
-    .filter(Boolean);
+  const visibleStats: StatItem[] = statsToShow
+  .map((key: string) => statItems[key as keyof typeof statItems])
+  .filter(Boolean) as StatItem[];
+
 
   // Calculate grid columns based on number of stats and responsive design
   const getGridCols = (count: number) => {
