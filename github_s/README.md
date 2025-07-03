@@ -11,8 +11,6 @@ A modern, responsive dashboard for visualizing your GitHub statistics and activi
 - Contribution insights
 - Dark/light mode support
 
-## Getting Started
-
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn
