@@ -1,21 +1,27 @@
-import { DefaultSession } from "next-auth"
+import NextAuth from "next-auth";
 
 declare module "next-auth" {
   interface Session {
-    accessToken?: string
-    user?: {
-      id?: string
-    } & DefaultSession["user"]
+    accessToken?: string;
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      login?: string; // Add GitHub username
+    };
   }
 
   interface User {
-    id?: string
+    id: string;
+    login?: string; // Add GitHub username
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    accessToken?: string
-    id?: string
+    accessToken?: string;
+    id?: string;
+    login?: string; // Add GitHub username
   }
 }

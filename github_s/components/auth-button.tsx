@@ -12,17 +12,21 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signIn, signOut, useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 export function AuthButton() {
   const { data: session, status } = useSession()
   const [isSigningIn, setIsSigningIn] = useState(false)
+  const router = useRouter()
 
   const handleSignIn = async () => {
     setIsSigningIn(true)
     try {
-      await signIn("github")
+      await signIn("github", { callbackUrl: "/dashboard" })
     } catch (error) {
       console.error("Sign in error:", error)
+      // Redirect to signin page which will handle the error display
+      router.push("/auth/signin")
     } finally {
       setIsSigningIn(false)
     }

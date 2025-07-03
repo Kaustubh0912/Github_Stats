@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 interface User {
   id: string
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(status === "loading")
+  const router = useRouter()
 
   useEffect(() => {
     if (status === "loading") {
@@ -50,9 +52,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async () => {
     setIsLoading(true)
     try {
-      await nextAuthSignIn("github")
+      await nextAuthSignIn("github", { callbackUrl: "/dashboard" })
     } catch (error) {
       console.error("Sign in error:", error)
+      // Redirect to signin page which will handle the error display
+      router.push("/auth/signin")
     } finally {
       setIsLoading(false)
     }

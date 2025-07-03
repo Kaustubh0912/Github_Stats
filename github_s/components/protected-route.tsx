@@ -2,19 +2,29 @@
 
 import type React from "react"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Github } from "lucide-react"
+import { AuthError } from "@/components/auth-error"
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [authError, setAuthError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/auth/signin")
+      // Check if there was an error in the URL query params
+      const url = new URL(window.location.href)
+      const error = url.searchParams.get("error")
+      
+      if (error) {
+        setAuthError(error)
+      } else {
+        router.push("/auth/signin")
+      }
     }
   }, [status, router])
 
@@ -34,6 +44,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     )
   }
 
+  if (authError) {
+    return <AuthError error={authError} onRetry={() => router.push("/auth/signin")} />
+  }
+  
   if (!session) {
     return null
   }

@@ -3,7 +3,8 @@
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { CheckCircle, XCircle, AlertCircle, Info } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function TestAuth() {
   const { data: session, status } = useSession()
@@ -17,6 +18,19 @@ export default function TestAuth() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 p-6">
       <div className="max-w-2xl mx-auto pt-20">
         <h1 className="text-3xl font-bold mb-8 text-center text-slate-900 dark:text-white">Authentication Test Page</h1>
+
+        <Alert className="mb-6 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-900">
+          <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <AlertTitle className="text-blue-600 dark:text-blue-400">GitHub OAuth Setup Required</AlertTitle>
+          <AlertDescription className="text-blue-700 dark:text-blue-300">
+            To enable GitHub authentication, you need to:
+            <ol className="list-decimal pl-5 mt-2 space-y-1">
+              <li>Create a GitHub OAuth App at <a href="https://github.com/settings/developers" target="_blank" rel="noopener noreferrer" className="underline">GitHub Developer Settings</a></li>
+              <li>Set the Authorization callback URL to: <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded">{process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/callback/github</code></li>
+              <li>Copy the Client ID and Client Secret to your <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded">.env</code> file</li>
+            </ol>
+          </AlertDescription>
+        </Alert>
 
         <div className="space-y-6">
           {/* Session Status */}
