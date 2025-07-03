@@ -42,7 +42,7 @@ export class GitHubService {
       throttle: {
         onRateLimit: (retryAfter: number, options: any) => {
           console.warn(
-            `Request quota exhausted for request ${options.method} ${options.url}`,
+            `Request quota exhausted for request ${options.method} ${options.url}`
           );
           if (options.request.retryCount === 0) {
             console.log(`Retrying after ${retryAfter} seconds!`);
@@ -51,7 +51,7 @@ export class GitHubService {
         },
         onSecondaryRateLimit: (retryAfter: number, options: any) => {
           console.warn(
-            `Secondary rate limit hit for ${options.method} ${options.url}`,
+            `Secondary rate limit hit for ${options.method} ${options.url}`
           );
         },
       },
@@ -82,7 +82,6 @@ export class GitHubService {
         username,
         per_page: 100,
         sort: "updated",
-        type: "public",
       });
       return data;
     } catch (error) {
@@ -100,7 +99,7 @@ export class GitHubService {
         {
           username,
           per_page: 100,
-        },
+        }
       );
       return data;
     } catch (error) {
@@ -180,15 +179,17 @@ export class GitHubService {
     const repos = await this.getPublicRepositories(username);
 
     // Calculate total stars
-    const stars = repos.reduce((acc, repo) => acc + repo.stargazers_count, 0);
-
+    const stars = repos.reduce(
+      (acc, repo) => acc + (repo.stargazers_count ?? 0),
+      0
+    );
     // Get contribution stats for the last year
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const contributionStats = await this.getContributionStats(
       username,
       oneYearAgo.toISOString(),
-      new Date().toISOString(),
+      new Date().toISOString()
     );
 
     // Get public events for commit counting
@@ -247,7 +248,7 @@ export class GitHubService {
     const contributionStats = await this.getContributionStats(
       profile.login,
       oneYearAgo.toISOString(),
-      new Date().toISOString(),
+      new Date().toISOString()
     );
 
     // Get search results for PRs and issues
@@ -289,8 +290,8 @@ export class GitHubService {
     // Get languages for the most recent and starred repositories
     const topRepos = repos
       .sort((a, b) => {
-        const aScore = a.stargazers_count + a.forks_count * 2;
-        const bScore = b.stargazers_count + b.forks_count * 2;
+        const aScore = (a.stargazers_count ?? 0) + (a.forks_count ?? 0) * 2;
+        const bScore = (b.stargazers_count ?? 0) + (b.forks_count ?? 0) * 2;
         return bScore - aScore;
       })
       .slice(0, 20);
@@ -302,7 +303,7 @@ export class GitHubService {
           owner: repo.owner.login,
           repo: repo.name,
         })
-        .catch(() => ({ data: {} })),
+        .catch(() => ({ data: {} }))
     );
 
     const languagesResults = await Promise.all(languagesPromises);
@@ -320,7 +321,7 @@ export class GitHubService {
     // Calculate total bytes
     const totalBytes = Array.from(languagesMap.values()).reduce(
       (acc, bytes) => acc + bytes,
-      0,
+      0
     );
 
     if (totalBytes === 0) {
@@ -389,7 +390,7 @@ export class GitHubService {
           owner: repo.owner.login,
           repo: repo.name,
         })
-        .catch(() => ({ data: {} })),
+        .catch(() => ({ data: {} }))
     );
 
     const languagesResults = await Promise.all(languagesPromises);
@@ -407,7 +408,7 @@ export class GitHubService {
     // Calculate total bytes
     const totalBytes = Array.from(languagesMap.values()).reduce(
       (acc, bytes) => acc + bytes,
-      0,
+      0
     );
 
     if (totalBytes === 0) {
@@ -469,15 +470,17 @@ export class GitHubService {
 
     // Format events as activities
     const activities = events
-      .filter((event) =>
-        [
-          "PushEvent",
-          "PullRequestEvent",
-          "IssuesEvent",
-          "CreateEvent",
-          "ForkEvent",
-          "WatchEvent",
-        ].includes(event.type),
+      .filter(
+        (event) =>
+          typeof event.type === "string" &&
+          [
+            "PushEvent",
+            "PullRequestEvent",
+            "IssuesEvent",
+            "CreateEvent",
+            "ForkEvent",
+            "WatchEvent",
+          ].includes(event.type)
       )
       .map((event) => {
         let type: "commit" | "pr" | "issue" = "commit";
@@ -534,7 +537,7 @@ export class GitHubService {
         }
 
         // Format time
-        const createdAt = new Date(event.created_at);
+        const createdAt = new Date(event.created_at ?? "");
         const now = new Date();
         const diffMs = now.getTime() - createdAt.getTime();
         const diffMins = Math.round(diffMs / (1000 * 60));

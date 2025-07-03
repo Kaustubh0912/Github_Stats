@@ -31,19 +31,20 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  events: {
-    async error(error) {
-      console.error("NextAuth error:", error);
+  logger: {
+    error(code, metadata) {
+      console.error("NextAuth error:", code, metadata);
     },
   },
+
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account) {
         token.accessToken = account.access_token;
         if (profile) {
-          token.id = profile.id;
-          // @ts-ignore
-          token.login = profile.login; // Add GitHub username to token
+          const githubProfile = profile as { id: number; login: string };
+          token.id = githubProfile.id.toString();
+          token.login = githubProfile.login;
         }
       }
       return token;
@@ -52,11 +53,11 @@ export const authOptions: NextAuthOptions = {
       if (token.accessToken) {
         session.accessToken = token.accessToken as string;
       }
-      if (session.user && token.id) {
+      if (session.user) {
         session.user.id = token.id as string;
-        // @ts-ignore
-        session.user.login = token.login as string; // Add GitHub username to session
+        (session.user as any).login = token.login as string;
       }
+
       return session;
     },
   },
