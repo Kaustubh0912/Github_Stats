@@ -1,7 +1,22 @@
 import { NextRequest } from "next/server";
 import { GitHubService } from "@/lib/github-service";
+type GradientStop = {
+  offset: string;
+  color: string;
+};
 
-const themeStyles = {
+type ThemeStyle = {
+  background: string;
+  border: string;
+  textPrimary: string;
+  textSecondary: string;
+  statBg: string;
+  avatarBorder: string;
+  isGradient: boolean;
+  gradientStops?: GradientStop[]; // ✅ optional key
+};
+
+const themeStyles: Record<string, ThemeStyle> = {
   "minimal-glass": {
     background: "rgba(255, 255, 255, 0.2)",
     border: "1px solid rgba(255, 255, 255, 0.3)",
