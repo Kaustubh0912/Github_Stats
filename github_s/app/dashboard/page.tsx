@@ -484,7 +484,7 @@ export default function Dashboard() {
                   </Card>
                 </div>
               </TabsContent>
-              // Updated languages tab content for your dashboard
+              
               <TabsContent value="languages" className="space-y-4 sm:space-y-6">
                 <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl">
                   <CardHeader>
