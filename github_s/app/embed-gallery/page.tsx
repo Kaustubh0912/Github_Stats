@@ -26,17 +26,21 @@ import {
   Star,
   Menu,
   X,
+  Monitor,
+  ExternalLink,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthButton } from "@/components/auth-button";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
 
+
 export default function EmbedGallery() {
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("github-dark");
+  const [embedFormat, setEmbedFormat] = useState("iframe"); // "iframe" or "github"
   const [showStats, setShowStats] = useState({
     commits: true,
     prs: true,
@@ -73,7 +77,7 @@ export default function EmbedGallery() {
 
         if (!statsRes.ok || !languagesRes.ok || !activityRes.ok) {
           const failed = [statsRes, languagesRes, activityRes].find(
-            (r) => !r.ok,
+            (r) => !r.ok
           );
           const errorData = await failed
             ?.json()
@@ -180,14 +184,35 @@ export default function EmbedGallery() {
   // Use the actual GitHub username from session
   const embedUsername = session?.user?.login || "username";
 
-  const embedCode = `<iframe
-  src="${typeof window !== "undefined" ? window.location.origin : "https://gitframe.dev"}/embed/${embedUsername}?theme=${selectedTheme}&opacity=${opacity[0]}&radius=${borderRadius[0]}&stats=${enabledStatsKeys.join(",")}"
+  // Generate the embed URL
+  const baseUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:3000";
+
+  const iframeUrl = `${baseUrl}/embed/${embedUsername}?theme=${selectedTheme}&opacity=${
+    opacity[0]
+  }&radius=${borderRadius[0]}&stats=${enabledStatsKeys.join(",")}`;
+
+  // For GitHub embed, exclude topLanguage and opacity/radius parameters
+  const githubStatsKeys = enabledStatsKeys;
+  const githubUrl = `${baseUrl}/api/stats-card/${embedUsername}?theme=${selectedTheme}&stats=${githubStatsKeys.join(
+    ","
+  )}`;
+
+  // Generate embed codes based on format
+  const iframeCode = `<iframe
+  src="${iframeUrl}"
   width="400"
   height="180"
   frameborder="0"
   scrolling="no"
   style="border-radius: ${borderRadius[0]}px; overflow: hidden;">
 </iframe>`;
+
+  const githubEmbedCode = `[![GitFrame](${githubUrl})](${githubUrl})`;
+
+  const embedCode = embedFormat === "iframe" ? iframeCode : githubEmbedCode;
 
   const handleCopy = () => {
     if (!session?.user?.login) {
@@ -202,8 +227,23 @@ export default function EmbedGallery() {
     navigator.clipboard.writeText(embedCode);
     toast({
       title: "Copied!",
-      description: "Embed code copied to clipboard.",
+      description: `${
+        embedFormat === "iframe" ? "Iframe" : "GitHub"
+      } embed code copied to clipboard.`,
     });
+  };
+
+  const handlePreview = () => {
+    if (!session?.user?.login) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to preview your embed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    window.open(iframeUrl, "_blank");
   };
 
   const selectedThemeConfig =
@@ -459,7 +499,9 @@ export default function EmbedGallery() {
 
                       {visibleStats.length > 0 ? (
                         <div
-                          className={`grid gap-3 ${getGridCols(visibleStats.length)}`}
+                          className={`grid gap-3 ${getGridCols(
+                            visibleStats.length
+                          )}`}
                         >
                           {visibleStats.map((stat, index) => {
                             const isLang = stat.key === "topLanguage";
@@ -479,7 +521,9 @@ export default function EmbedGallery() {
                                     isLang && isLongLanguageName
                                       ? "text-base lg:text-lg"
                                       : "text-xl lg:text-2xl"
-                                  } ${isLang ? "break-words hyphens-auto" : ""}`}
+                                  } ${
+                                    isLang ? "break-words hyphens-auto" : ""
+                                  }`}
                                 >
                                   {loading ? (
                                     <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -529,9 +573,11 @@ export default function EmbedGallery() {
                     Customize
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 lg:space-y-8">
-                  <div>
-                    <h4 className="font-medium mb-4 text-slate-900 dark:text-white text-base lg:text-lg">
+
+                <CardContent className="space-y-8">
+                  {/* --- Show Stats --- */}
+                  <div className="space-y-4">
+                    <h4 className="text-base lg:text-lg font-medium text-slate-900 dark:text-white">
                       Show Stats
                     </h4>
                     <div className="space-y-3">
@@ -565,61 +611,103 @@ export default function EmbedGallery() {
                     </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-medium mb-4 text-slate-900 dark:text-white text-base lg:text-lg">
+                  {/* --- Opacity --- */}
+                  <div className="space-y-4">
+                    <h4 className="text-base lg:text-lg font-medium text-slate-900 dark:text-white">
                       Background Opacity
                     </h4>
-                    <div className="space-y-3">
-                      <Slider
-                        value={opacity}
-                        onValueChange={setOpacity}
-                        max={100}
-                        min={10}
-                        step={10}
-                        className="w-full"
-                      />
-                      <div className="text-sm lg:text-base text-slate-600 dark:text-slate-400 text-center font-medium">
-                        {opacity[0]}%
-                      </div>
+                    <Slider
+                      value={opacity}
+                      onValueChange={setOpacity}
+                      max={100}
+                      min={10}
+                      step={10}
+                      className="w-full"
+                    />
+                    <div className="text-center text-sm lg:text-base font-medium text-slate-600 dark:text-slate-400">
+                      {opacity[0]}%
                     </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-medium mb-4 text-slate-900 dark:text-white text-base lg:text-lg">
+                  {/* --- Border Radius --- */}
+                  <div className="space-y-4">
+                    <h4 className="text-base lg:text-lg font-medium text-slate-900 dark:text-white">
                       Border Radius
                     </h4>
-                    <div className="space-y-3">
-                      <Slider
-                        value={borderRadius}
-                        onValueChange={setBorderRadius}
-                        max={24}
-                        min={0}
-                        step={2}
-                        className="w-full"
-                      />
-                      <div className="text-sm lg:text-base text-slate-600 dark:text-slate-400 text-center font-medium">
-                        {borderRadius[0]}px
-                      </div>
+                    <Slider
+                      value={borderRadius}
+                      onValueChange={setBorderRadius}
+                      max={24}
+                      min={0}
+                      step={2}
+                      className="w-full"
+                    />
+                    <div className="text-center text-sm lg:text-base font-medium text-slate-600 dark:text-slate-400">
+                      {borderRadius[0]}px
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-                    <h4 className="font-medium mb-4 text-slate-900 dark:text-white text-base lg:text-lg">
-                      Embed Code
-                    </h4>
-                    <div className="bg-slate-900 dark:bg-slate-800 rounded-xl p-4 mb-4 overflow-x-auto">
-                      <code className="text-xs lg:text-sm text-green-400 font-mono whitespace-pre-wrap break-all">
+                  {/* --- Embed Format & Code --- */}
+                  <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-6">
+                    <div className="space-y-4">
+                      <h4 className="text-base lg:text-lg font-medium text-slate-900 dark:text-white">
+                        Embed Format
+                      </h4>
+
+                      <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                        <button
+                          onClick={() => setEmbedFormat("iframe")}
+                          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                            embedFormat === "iframe"
+                              ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
+                              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                          }`}
+                        >
+                          <Monitor className="w-4 h-4" />
+                          Iframe
+                        </button>
+                        <button
+                          onClick={() => setEmbedFormat("github")}
+                          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                            embedFormat === "github"
+                              ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
+                              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                          }`}
+                        >
+                          <Github className="w-4 h-4" />
+                          GitHub
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Code Display */}
+                    <div className="bg-slate-900 dark:bg-slate-800 rounded-xl p-4 overflow-x-auto">
+                      <code className="text-xs lg:text-sm text-green-400 font-mono whitespace-pre-wrap break-words">
                         {embedCode}
                       </code>
                     </div>
-                    <Button
-                      onClick={handleCopy}
-                      disabled={!session?.user?.login}
-                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm lg:text-base py-3 lg:py-4"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy Embed Code
-                    </Button>
+
+                    {/* Copy and Preview Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleCopy}
+                        disabled={!session?.user?.login}
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm lg:text-base py-3 lg:py-4"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy {embedFormat === "iframe" ? "Iframe" : "GitHub"}
+                      </Button>
+
+                      <Button
+                        onClick={handlePreview}
+                        disabled={!session?.user?.login}
+                        variant="outline"
+                        className="px-4 py-3 lg:py-4 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    </div>
+
                     {!session?.user?.login && (
                       <p className="text-xs lg:text-sm text-center mt-3 text-slate-500">
                         Please sign in to generate your personalized embed code.
