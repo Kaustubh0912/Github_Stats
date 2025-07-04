@@ -31,68 +31,6 @@ export interface GitHubActivity {
   url?: string;
 }
 
-// Language colors mapping
-export const languageColors: Record<string, string> = {
-  TypeScript: "bg-blue-500",
-  JavaScript: "bg-yellow-400",
-  Python: "bg-green-500",
-  "C++": "bg-rose-600",
-  "C#": "bg-violet-600",
-  ShaderLab: "bg-emerald-500",
-  Java: "bg-red-600",
-  C: "bg-blue-700",
-  HTML: "bg-orange-400",
-  CSS: "bg-teal-500",
-  Rust: "bg-orange-500",
-  Go: "bg-cyan-500",
-  Dart: "bg-sky-500",
-  Vue: "bg-green-400",
-  Swift: "bg-orange-300",
-  Shell: "bg-gray-700",
-  YAML: "bg-yellow-600",
-  JSON: "bg-zinc-500",
-  PHP: "bg-indigo-500",
-  Ruby: "bg-red-500",
-  Kotlin: "bg-purple-500",
-  Scala: "bg-red-700",
-  HLSL: "bg-lime-500",
-  GLSL: "bg-green-600",
-  "Objective-C": "bg-blue-600",
-  PowerShell: "bg-blue-400",
-  Dockerfile: "bg-cyan-600",
-  Makefile: "bg-amber-600",
-  CMake: "bg-green-700",
-  Batchfile: "bg-gray-600",
-  Assembly: "bg-purple-700",
-  Perl: "bg-blue-800",
-  Lua: "bg-indigo-600",
-  R: "bg-blue-300",
-  MATLAB: "bg-orange-600",
-  Fortran: "bg-purple-600",
-  Haskell: "bg-purple-400",
-  Erlang: "bg-red-400",
-  Elixir: "bg-purple-500",
-  Clojure: "bg-green-600",
-  "F#": "bg-violet-500",
-  "Visual Basic": "bg-blue-400",
-  Delphi: "bg-red-300",
-  Pascal: "bg-yellow-700",
-  COBOL: "bg-blue-900",
-};
-
-// Helper function to get language color with fallback
-export function getLanguageColor(languageName: string): string {
-  const cleanName = languageName.trim();
-  const color = languageColors[cleanName];
-  
-  if (!color) {
-    console.warn(`Missing color for language: "${cleanName}"`);
-    return "bg-gray-500"; // Fallback color
-  }
-  
-  return color;
-}
-
 export class GitHubService {
   private octokit: Octokit;
 
@@ -104,7 +42,7 @@ export class GitHubService {
       throttle: {
         onRateLimit: (retryAfter: number, options: any) => {
           console.warn(
-            `Request quota exhausted for request ${options.method} ${options.url}`
+            `Request quota exhausted for request ${options.method} ${options.url}`,
           );
           if (options.request.retryCount === 0) {
             console.log(`Retrying after ${retryAfter} seconds!`);
@@ -113,7 +51,7 @@ export class GitHubService {
         },
         onSecondaryRateLimit: (retryAfter: number, options: any) => {
           console.warn(
-            `Secondary rate limit hit for ${options.method} ${options.url}`
+            `Secondary rate limit hit for ${options.method} ${options.url}`,
           );
         },
       },
@@ -161,7 +99,7 @@ export class GitHubService {
         {
           username,
           per_page: 100,
-        }
+        },
       );
       return data;
     } catch (error) {
@@ -222,7 +160,8 @@ export class GitHubService {
         to,
       });
 
-      return (response as any).user.contributionsCollection;
+      // @ts-ignore
+      return response.user.contributionsCollection;
     } catch (error) {
       console.error("Error fetching contribution stats:", error);
       return null;
@@ -242,23 +181,23 @@ export class GitHubService {
     // Calculate total stars
     const stars = repos.reduce(
       (acc, repo) => acc + (repo.stargazers_count ?? 0),
-      0
+      0,
     );
-
     // Get contribution stats for the last year
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const contributionStats = await this.getContributionStats(
       username,
       oneYearAgo.toISOString(),
-      new Date().toISOString()
+      new Date().toISOString(),
     );
 
     // Get public events for commit counting
     const events = await this.getPublicEvents(username);
     const commits = events
       .filter((event) => event.type === "PushEvent")
-      .reduce((acc, event) => acc + ((event.payload as any)?.size || 0), 0);
+      // @ts-ignore
+      .reduce((acc, event) => acc + (event.payload.size || 0), 0);
 
     // Get search results for PRs and issues (more accurate than events)
     const [prsResult, issuesResult] = await Promise.all([
@@ -301,7 +240,7 @@ export class GitHubService {
     const repos = await this.getUserRepositories();
 
     // Calculate total stars
-    const stars = repos.reduce((acc, repo) => acc + (repo.stargazers_count || 0), 0);
+    const stars = repos.reduce((acc, repo) => acc + repo.stargazers_count, 0);
 
     // Get contribution stats for the last year
     const oneYearAgo = new Date();
@@ -309,7 +248,7 @@ export class GitHubService {
     const contributionStats = await this.getContributionStats(
       profile.login,
       oneYearAgo.toISOString(),
-      new Date().toISOString()
+      new Date().toISOString(),
     );
 
     // Get search results for PRs and issues
@@ -327,8 +266,8 @@ export class GitHubService {
     return {
       totalCommits: contributionStats?.totalCommitContributions || 0,
       repositories: repos.length,
-      followers: profile.followers || 0,
-      following: profile.following || 0,
+      followers: profile.followers,
+      following: profile.following,
       stars,
       prs: prsResult.data.total_count,
       issues: issuesResult.data.total_count,
@@ -364,7 +303,7 @@ export class GitHubService {
           owner: repo.owner.login,
           repo: repo.name,
         })
-        .catch(() => ({ data: {} }))
+        .catch(() => ({ data: {} })),
     );
 
     const languagesResults = await Promise.all(languagesPromises);
@@ -375,26 +314,52 @@ export class GitHubService {
       const languages = result.data;
       Object.entries(languages).forEach(([language, bytes]) => {
         const current = languagesMap.get(language) || 0;
-        languagesMap.set(language, current + (bytes as number));
+        languagesMap.set(language, current + bytes);
       });
     });
 
     // Calculate total bytes
     const totalBytes = Array.from(languagesMap.values()).reduce(
       (acc, bytes) => acc + bytes,
-      0
+      0,
     );
 
     if (totalBytes === 0) {
       return [];
     }
 
+    // Map of language colors
+    const languageColors: Record<string, string> = {
+      TypeScript: "bg-blue-500",
+      JavaScript: "bg-yellow-500",
+      Python: "bg-green-500",
+      Go: "bg-cyan-500",
+      Rust: "bg-orange-500",
+      Java: "bg-red-500",
+      "C#": "bg-purple-500",
+      Ruby: "bg-pink-500",
+      PHP: "bg-indigo-500",
+      HTML: "bg-gray-500",
+      CSS: "bg-teal-500",
+      Shell: "bg-gray-700",
+      C: "bg-blue-700",
+      "C++": "bg-red-700",
+      Swift: "bg-orange-400",
+      Kotlin: "bg-purple-400",
+      Dart: "bg-blue-400",
+      Vue: "bg-green-400",
+      Svelte: "bg-red-400",
+      Dockerfile: "bg-blue-600",
+      YAML: "bg-yellow-600",
+      JSON: "bg-gray-600",
+    };
+
     // Convert to array and sort by percentage
     const languages = Array.from(languagesMap.entries())
       .map(([name, bytes]) => ({
         name,
         percentage: Math.round((bytes / totalBytes) * 100),
-        color: getLanguageColor(name),
+        color: languageColors[name] || "bg-gray-500",
         lines: Math.round(bytes / 30),
       }))
       .sort((a, b) => b.percentage - a.percentage)
@@ -412,8 +377,8 @@ export class GitHubService {
     // Get languages for the most recent and starred repositories
     const topRepos = repos
       .sort((a, b) => {
-        const aScore = (a.stargazers_count || 0) + (a.forks_count || 0) * 2;
-        const bScore = (b.stargazers_count || 0) + (b.forks_count || 0) * 2;
+        const aScore = a.stargazers_count + a.forks_count * 2;
+        const bScore = b.stargazers_count + b.forks_count * 2;
         return bScore - aScore;
       })
       .slice(0, 20);
@@ -425,7 +390,7 @@ export class GitHubService {
           owner: repo.owner.login,
           repo: repo.name,
         })
-        .catch(() => ({ data: {} }))
+        .catch(() => ({ data: {} })),
     );
 
     const languagesResults = await Promise.all(languagesPromises);
@@ -436,26 +401,52 @@ export class GitHubService {
       const languages = result.data;
       Object.entries(languages).forEach(([language, bytes]) => {
         const current = languagesMap.get(language) || 0;
-        languagesMap.set(language, current + (bytes as number));
+        languagesMap.set(language, current + bytes);
       });
     });
 
     // Calculate total bytes
     const totalBytes = Array.from(languagesMap.values()).reduce(
       (acc, bytes) => acc + bytes,
-      0
+      0,
     );
 
     if (totalBytes === 0) {
       return [];
     }
 
+    // Map of language colors
+    const languageColors: Record<string, string> = {
+      TypeScript: "bg-blue-500",
+      JavaScript: "bg-yellow-500",
+      Python: "bg-green-500",
+      Go: "bg-cyan-500",
+      Rust: "bg-orange-500",
+      Java: "bg-red-500",
+      "C#": "bg-purple-500",
+      Ruby: "bg-pink-500",
+      PHP: "bg-indigo-500",
+      HTML: "bg-gray-500",
+      CSS: "bg-teal-500",
+      Shell: "bg-gray-700",
+      C: "bg-blue-700",
+      "C++": "bg-red-700",
+      Swift: "bg-orange-400",
+      Kotlin: "bg-purple-400",
+      Dart: "bg-blue-400",
+      Vue: "bg-green-400",
+      Svelte: "bg-red-400",
+      Dockerfile: "bg-blue-600",
+      YAML: "bg-yellow-600",
+      JSON: "bg-gray-600",
+    };
+
     // Convert to array and sort by percentage
     const languages = Array.from(languagesMap.entries())
       .map(([name, bytes]) => ({
         name,
         percentage: Math.round((bytes / totalBytes) * 100),
-        color: getLanguageColor(name),
+        color: languageColors[name] || "bg-gray-500",
         lines: Math.round(bytes / 30),
       }))
       .sort((a, b) => b.percentage - a.percentage)
@@ -489,7 +480,7 @@ export class GitHubService {
             "CreateEvent",
             "ForkEvent",
             "WatchEvent",
-          ].includes(event.type)
+          ].includes(event.type),
       )
       .map((event) => {
         let type: "commit" | "pr" | "issue" = "commit";
@@ -497,12 +488,11 @@ export class GitHubService {
         let message = "";
         let url = `https://github.com/${repo}`;
 
-        const payload = event.payload as any;
-
         switch (event.type) {
           case "PushEvent":
             type = "commit";
-            const commits = payload.commits || [];
+            // @ts-ignore
+            const commits = event.payload.commits || [];
             const commitCount = commits.length;
             if (commitCount === 1) {
               message = commits[0].message || "Pushed 1 commit";
@@ -512,21 +502,28 @@ export class GitHubService {
             break;
           case "PullRequestEvent":
             type = "pr";
-            const action = payload.action;
-            const prTitle = payload.pull_request?.title;
+            // @ts-ignore
+            const action = event.payload.action;
+            // @ts-ignore
+            const prTitle = event.payload.pull_request?.title;
             message = `${action} pull request: ${prTitle}`;
-            url = payload.pull_request?.html_url;
+            // @ts-ignore
+            url = event.payload.pull_request?.html_url;
             break;
           case "IssuesEvent":
             type = "issue";
-            const issueAction = payload.action;
-            const issueTitle = payload.issue?.title;
+            // @ts-ignore
+            const issueAction = event.payload.action;
+            // @ts-ignore
+            const issueTitle = event.payload.issue?.title;
             message = `${issueAction} issue: ${issueTitle}`;
-            url = payload.issue?.html_url;
+            // @ts-ignore
+            url = event.payload.issue?.html_url;
             break;
           case "CreateEvent":
             type = "commit";
-            const refType = payload.ref_type;
+            // @ts-ignore
+            const refType = event.payload.ref_type;
             message = `Created ${refType}`;
             break;
           case "ForkEvent":

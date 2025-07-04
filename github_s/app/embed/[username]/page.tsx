@@ -27,7 +27,6 @@ interface StatItem {
   icon: React.ReactNode;
 }
 
-
 export async function generateMetadata({
   params,
 }: EmbedProps): Promise<Metadata> {
@@ -63,13 +62,15 @@ async function getEmbedData(
     });
 
     if (!response.ok) {
+      console.error(`API Error: ${response.status} ${response.statusText}`);
       if (response.status === 404) {
         return null; // This will trigger notFound()
       }
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Error fetching embed data:", error);
     return { error: "Could not fetch data." };
@@ -156,9 +157,8 @@ export default async function EmbedPage({ params, searchParams }: EmbedProps) {
   };
 
   const visibleStats: StatItem[] = statsToShow
-  .map((key: string) => statItems[key as keyof typeof statItems])
-  .filter(Boolean) as StatItem[];
-
+    .map((key: string) => statItems[key as keyof typeof statItems])
+    .filter(Boolean) as StatItem[];
 
   // Calculate grid columns based on number of stats and responsive design
   const getGridCols = (count: number) => {

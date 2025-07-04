@@ -50,7 +50,13 @@ export async function GET(
       statsToShow,
     };
 
-    return NextResponse.json(embedData);
+    return NextResponse.json(embedData, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
   } catch (error) {
     console.error("Error generating embed:", error);
     const errorMessage =
@@ -63,7 +69,14 @@ export async function GET(
       {
         error: `Failed to generate embed for user. ${status === 404 ? "User not found." : ""}`,
       },
-      { status },
+      {
+        status,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      },
     );
   }
 }

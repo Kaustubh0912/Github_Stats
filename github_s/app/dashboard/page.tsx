@@ -64,10 +64,11 @@ export default function Dashboard() {
         setLoading(true);
         setError(null);
 
-        // Fetch stats
+        // Fetch stats - this should now use the authenticated user's data
         const statsResponse = await fetch("/api/github/stats");
         if (!statsResponse.ok) {
           const errorData = await statsResponse.json().catch(() => ({}));
+          console.error("Stats API error:", errorData);
           throw new Error(errorData.error || "Failed to fetch GitHub stats");
         }
         const statsData = await statsResponse.json();
@@ -77,8 +78,9 @@ export default function Dashboard() {
         const languagesResponse = await fetch("/api/github/languages");
         if (!languagesResponse.ok) {
           const errorData = await languagesResponse.json().catch(() => ({}));
+          console.error("Languages API error:", errorData);
           throw new Error(
-            errorData.error || "Failed to fetch GitHub languages"
+            errorData.error || "Failed to fetch GitHub languages",
           );
         }
         const languagesData = await languagesResponse.json();
@@ -88,6 +90,7 @@ export default function Dashboard() {
         const activityResponse = await fetch("/api/github/activity");
         if (!activityResponse.ok) {
           const errorData = await activityResponse.json().catch(() => ({}));
+          console.error("Activity API error:", errorData);
           throw new Error(errorData.error || "Failed to fetch GitHub activity");
         }
         const activityData = await activityResponse.json();
@@ -95,7 +98,7 @@ export default function Dashboard() {
       } catch (err) {
         console.error("Error fetching GitHub data:", err);
         setError(
-          err instanceof Error ? err.message : "An unknown error occurred"
+          err instanceof Error ? err.message : "An unknown error occurred",
         );
       } finally {
         setLoading(false);
@@ -281,7 +284,7 @@ export default function Dashboard() {
                       {statsData?.login && ` • @${statsData.login}`}
                       {statsData?.created_at &&
                         ` • Joined ${new Date(
-                          statsData.created_at
+                          statsData.created_at,
                         ).toLocaleDateString()}`}
                     </p>
                   </div>
@@ -290,7 +293,7 @@ export default function Dashboard() {
                   <Button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     variant="outline"
-                    className="flex items-center gap-2 border-slate-300 dark:border-slate-700 w-full sm:w-auto"
+                    className="z-10 flex items-center gap-2 border-slate-300 dark:border-slate-700 w-full sm:w-auto"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out

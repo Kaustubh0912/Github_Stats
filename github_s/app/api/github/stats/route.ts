@@ -1,101 +1,47 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { GitHubService } from "@/lib/github-service";
+import { authOptions } from "@/lib/auth-options";
+
 export async function GET() {
-  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-
-  if (!GITHUB_TOKEN) {
-    return Response.json({ error: "Missing GitHub token" }, { status: 500 });
-  }
-
-  const headers = {
-    Authorization: `Bearer ${GITHUB_TOKEN}`,
-    "Content-Type": "application/json",
-  };
-
-  const query = `
-    {
-      user(login: "Kaustubh0912") {
-        name
-        login
-        bio
-        avatarUrl
-        createdAt
-        followers {
-          totalCount
-        }
-        following {
-          totalCount
-        }
-        pullRequests {
-          totalCount
-        }
-        issues {
-          totalCount
-        }
-        contributionsCollection {
-          contributionCalendar {
-            totalContributions
-          }
-        }
-        repositories(first: 100, privacy: PUBLIC) {
-          totalCount
-          nodes {
-            stargazers {
-              totalCount
-            }
-            defaultBranchRef {
-              target {
-                ... on Commit {
-                  history {
-                    totalCount
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
-
   try {
-    const res = await fetch("https://api.github.com/graphql", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ query }),
-    });
+    // Get the session with auth options to ensure we get the access token
+    const session = await getServerSession(authOptions);
 
-    if (!res.ok) {
-      return Response.json({ error: "GitHub API request failed" }, { status: 500 });
+    // Check if user is authenticated
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
     }
 
-    const json = await res.json();
-    const user = json.data.user;
+    // Check if access token is available
+    if (!session.accessToken) {
+      console.error(
+        "Access token missing from session:",
+        JSON.stringify(session, null, 2),
+      );
+      return NextResponse.json(
+        {
+          error:
+            "GitHub access token not available. Please sign out and sign in again.",
+        },
+        { status: 401 },
+      );
+    }
 
-    const repos = user.repositories.nodes;
+    // Create GitHub service with user's access token
+    const githubService = new GitHubService(session.accessToken);
 
-    const totalCommits = repos.reduce((sum: number, repo: any) => {
-      return sum + (repo.defaultBranchRef?.target?.history?.totalCount || 0);
-    }, 0);
+    // Get authenticated user stats instead of hardcoded user
+    const stats = await githubService.getUserStats();
 
-    const totalStars = repos.reduce((sum: number, repo: any) => {
-      return sum + (repo.stargazers?.totalCount || 0);
-    }, 0);
-
-    return Response.json({
-      name: user.name,
-      login: user.login,
-      bio: user.bio,
-      avatar_url: user.avatarUrl,
-      created_at: user.createdAt,
-      totalCommits,
-      repositories: user.repositories.totalCount,
-      stars: totalStars,
-      followers: user.followers.totalCount,
-      following: user.following.totalCount,
-      prs: user.pullRequests.totalCount,
-      issues: user.issues.totalCount,
-      contributions: user.contributionsCollection.contributionCalendar.totalContributions,
-    });
-  } catch (err) {
-    return Response.json({ error: "Unexpected error" }, { status: 500 });
+    return NextResponse.json(stats);
+  } catch (error) {
+    console.error("Error fetching GitHub stats:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch GitHub stats";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
