@@ -17,7 +17,7 @@ import {
   Download,
   Menu,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthButton } from "@/components/auth-button";
 
@@ -347,7 +347,7 @@ export default function LandingPage() {
       <footer className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-sm sm:max-w-md px-4">
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl px-4 sm:px-6 py-3 shadow-2xl">
           <div className="flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-            <span>© 2024 GitFrame</span>
+            <span>© 2025 GitFrame</span>
             <div className="flex items-center gap-2 sm:gap-4">
               <Link
                 href="/dev"

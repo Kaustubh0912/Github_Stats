@@ -8,7 +8,7 @@ import {
   AlertCircle,
   Layers3,
   Code,
-} from "lucide-react";
+} from "@/components/icons";
 
 interface EmbedProps {
   params: {

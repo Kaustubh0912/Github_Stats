@@ -24,7 +24,7 @@ import {
   ExternalLink,
   Menu,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { signOut } from "next-auth/react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -78,7 +78,7 @@ export default function Dashboard() {
         if (!languagesResponse.ok) {
           const errorData = await languagesResponse.json().catch(() => ({}));
           throw new Error(
-            errorData.error || "Failed to fetch GitHub languages",
+            errorData.error || "Failed to fetch GitHub languages"
           );
         }
         const languagesData = await languagesResponse.json();
@@ -95,7 +95,7 @@ export default function Dashboard() {
       } catch (err) {
         console.error("Error fetching GitHub data:", err);
         setError(
-          err instanceof Error ? err.message : "An unknown error occurred",
+          err instanceof Error ? err.message : "An unknown error occurred"
         );
       } finally {
         setLoading(false);
@@ -123,12 +123,6 @@ export default function Dashboard() {
   const totalContributions = statsData?.contributions || 0;
 
   // Calculate growth percentages (mock data for now)
-  const growthStats = {
-    commits: "+12%",
-    repos: "+3%",
-    stars: "+18%",
-    followers: "+7%",
-  };
 
   return (
     <ProtectedRoute>
@@ -286,7 +280,9 @@ export default function Dashboard() {
                       {statsData?.name || user?.name || "Welcome!"}
                       {statsData?.login && ` • @${statsData.login}`}
                       {statsData?.created_at &&
-                        ` • Joined ${new Date(statsData.created_at).toLocaleDateString()}`}
+                        ` • Joined ${new Date(
+                          statsData.created_at
+                        ).toLocaleDateString()}`}
                     </p>
                   </div>
                 </div>
@@ -312,7 +308,6 @@ export default function Dashboard() {
                   icon: GitCommit,
                   color: "text-blue-500",
                   bg: "bg-blue-500/10",
-                  change: growthStats.commits,
                 },
                 {
                   label: "Repositories",
@@ -320,7 +315,6 @@ export default function Dashboard() {
                   icon: Code2,
                   color: "text-green-500",
                   bg: "bg-green-500/10",
-                  change: growthStats.repos,
                 },
                 {
                   label: "Stars Earned",
@@ -328,7 +322,6 @@ export default function Dashboard() {
                   icon: Star,
                   color: "text-yellow-500",
                   bg: "bg-yellow-500/10",
-                  change: growthStats.stars,
                 },
                 {
                   label: "Followers",
@@ -336,7 +329,6 @@ export default function Dashboard() {
                   icon: Users,
                   color: "text-purple-500",
                   bg: "bg-purple-500/10",
-                  change: growthStats.followers,
                 },
               ].map((stat, index) => (
                 <Card
@@ -352,9 +344,6 @@ export default function Dashboard() {
                           className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color}`}
                         />
                       </div>
-                      <Badge variant="secondary" className="text-xs">
-                        {stat.change}
-                      </Badge>
                     </div>
                     <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-1">
                       {stat.value.toLocaleString()}
@@ -394,7 +383,6 @@ export default function Dashboard() {
                   Contributions
                 </TabsTrigger>
               </TabsList>
-
               <TabsContent value="overview" className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                   {/* Recent Activity */}
@@ -464,26 +452,18 @@ export default function Dashboard() {
                         {
                           label: "Pull Requests",
                           value: totalPRs,
-                          change: "+12%",
-                          positive: true,
                         },
                         {
                           label: "Issues Opened",
                           value: totalIssues,
-                          change: "-5%",
-                          positive: false,
                         },
                         {
                           label: "Contributions",
                           value: totalContributions,
-                          change: "+23%",
-                          positive: true,
                         },
                         {
                           label: "Following",
                           value: statsData?.following || 0,
-                          change: "+8%",
-                          positive: true,
                         },
                       ].map((stat, index) => (
                         <div
@@ -497,12 +477,6 @@ export default function Dashboard() {
                             <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                               {stat.value.toLocaleString()}
                             </span>
-                            <Badge
-                              variant={stat.positive ? "default" : "secondary"}
-                              className={`text-xs ${stat.positive ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}
-                            >
-                              {stat.change}
-                            </Badge>
                           </div>
                         </div>
                       ))}
@@ -510,7 +484,7 @@ export default function Dashboard() {
                   </Card>
                 </div>
               </TabsContent>
-
+              // Updated languages tab content for your dashboard
               <TabsContent value="languages" className="space-y-4 sm:space-y-6">
                 <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl">
                   <CardHeader>
@@ -524,24 +498,46 @@ export default function Dashboard() {
                       languages.map((lang, index) => (
                         <div key={index} className="space-y-2">
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                            <span className="font-medium text-slate-900 dark:text-white">
-                              {lang.name}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              {/* Color indicator dot */}
+                              <div
+                                className={`w-3 h-3 rounded-full ${
+                                  lang.color || "bg-gray-500"
+                                }`}
+                              />
+                              <span className="font-medium text-slate-900 dark:text-white">
+                                {lang.name}
+                              </span>
+                            </div>
                             <div className="flex items-center gap-3 text-sm">
                               <span className="text-slate-600 dark:text-slate-400">
-                                {lang.lines.toLocaleString()} lines
+                                {lang.lines?.toLocaleString() || 0} lines
                               </span>
                               <span className="font-medium text-slate-700 dark:text-slate-300">
                                 {lang.percentage}%
                               </span>
                             </div>
                           </div>
+
+                          {/* Progress bar with proper fallback */}
                           <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                             <div
-                              className={`h-full ${lang.color} rounded-full transition-all duration-1000 ease-out`}
-                              style={{ width: `${lang.percentage}%` }}
+                              className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                                lang.color || "bg-gray-500"
+                              }`}
+                              style={{
+                                width: `${Math.max(lang.percentage, 0)}%`,
+                                minWidth: lang.percentage > 0 ? "4px" : "0px", // Ensure small percentages are visible
+                              }}
                             />
                           </div>
+
+                          {/* Debug info (remove in production) */}
+                          {process.env.NODE_ENV === "development" && (
+                            <div className="text-xs text-gray-400 opacity-50">
+                              Debug: {lang.name} → {lang.color || "NO COLOR"}
+                            </div>
+                          )}
                         </div>
                       ))
                     ) : (
@@ -553,7 +549,6 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               </TabsContent>
-
               <TabsContent value="activity">
                 <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl">
                   <CardHeader>
@@ -625,7 +620,6 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               </TabsContent>
-
               <TabsContent value="contributions">
                 <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl">
                   <CardHeader>
@@ -738,7 +732,7 @@ export default function Dashboard() {
         <footer className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-sm sm:max-w-md px-4">
           <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl px-4 sm:px-6 py-3 shadow-2xl">
             <div className="flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-              <span>© 2024 GitFrame</span>
+              <span>© 2025 GitFrame</span>
               <div className="flex items-center gap-2 sm:gap-4">
                 <Link
                   href="/dev"

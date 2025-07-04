@@ -73,4 +73,57 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
+  safelist: [
+    // Language bar colors - these will never be purged
+    "bg-blue-500",
+    "bg-yellow-400", 
+    "bg-green-500",
+    "bg-rose-600",      // C++
+    "bg-violet-600",    // C#
+    "bg-emerald-500",   // ShaderLab
+    "bg-red-600",
+    "bg-blue-700",
+    "bg-orange-400",
+    "bg-teal-500",
+    "bg-orange-500",
+    "bg-cyan-500",
+    "bg-sky-500",
+    "bg-green-400",
+    "bg-orange-300",
+    "bg-gray-700",
+    "bg-yellow-600",
+    "bg-zinc-500",
+    "bg-indigo-500",
+    "bg-red-500",
+    "bg-purple-500",
+    "bg-red-700",
+    "bg-lime-500",
+    "bg-green-600",
+    "bg-blue-600",
+    "bg-blue-400",
+    "bg-cyan-600",
+    "bg-amber-600",
+    "bg-green-700",
+    "bg-gray-600",
+    "bg-purple-700",
+    "bg-blue-800",
+    "bg-indigo-600",
+    "bg-blue-300",
+    "bg-orange-600",
+    "bg-purple-600",
+    "bg-purple-400",
+    "bg-red-400",
+    "bg-green-600",
+    "bg-violet-500",
+    "bg-red-300",
+    "bg-yellow-700",
+    "bg-blue-900",
+    "bg-gray-500",      // Fallback color
+    
+    // Optional: Add hover and focus variants if needed
+    "hover:bg-blue-600",
+    "hover:bg-yellow-500",
+    "hover:bg-green-600",
+    // ... add more hover states as needed
+  ],
 }

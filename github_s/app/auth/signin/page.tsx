@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Github, ArrowLeft, Info } from "lucide-react";
+import { Github, ArrowLeft,Info } from "@/components/icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { signIn, useSession } from "next-auth/react";
 import { AuthError } from "@/components/auth-error";
@@ -93,43 +93,7 @@ export default function SignIn() {
         <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_35%,rgba(255,255,255,0.1)_50%,transparent_65%)] bg-[length:24px_24px]" />
       </div>
 
-      <div className="w-full max-w-md space-y-4 sm:space-y-6">
-        <Alert className="bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-900">
-          <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <AlertTitle className="text-blue-600 dark:text-blue-400">
-            GitHub OAuth Setup Required
-          </AlertTitle>
-          <AlertDescription className="text-blue-700 dark:text-blue-300">
-            To enable GitHub authentication, you need to:
-            <ol className="list-decimal pl-5 mt-2 space-y-1 text-sm">
-              <li>
-                Create a GitHub OAuth App at{" "}
-                <a
-                  href="https://github.com/settings/developers"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  GitHub Developer Settings
-                </a>
-              </li>
-              <li>
-                Set the Authorization callback URL to:{" "}
-                <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded text-xs break-all">
-                  {process.env.NEXT_PUBLIC_NEXTAUTH_URL}
-                  /api/auth/callback/github
-                </code>
-              </li>
-              <li>
-                Copy the Client ID and Client Secret to your{" "}
-                <code className="bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded">
-                  .env
-                </code>{" "}
-                file
-              </li>
-            </ol>
-          </AlertDescription>
-        </Alert>
+      
 
         <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-3xl shadow-2xl">
           <CardHeader className="text-center pb-6 sm:pb-8">
@@ -177,6 +141,5 @@ export default function SignIn() {
           </CardContent>
         </Card>
       </div>
-    </div>
   );
 }

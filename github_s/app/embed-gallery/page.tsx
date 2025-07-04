@@ -28,7 +28,7 @@ import {
   X,
   Monitor,
   ExternalLink,
-} from "lucide-react";
+} from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthButton } from "@/components/auth-button";
 import { useSession } from "next-auth/react";

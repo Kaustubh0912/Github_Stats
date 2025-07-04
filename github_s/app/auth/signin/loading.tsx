@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Github } from "lucide-react"
+import { IconBrandGithubFilled as Github } from "@tabler/icons-react"
 
 export default function Loading() {
   return (
