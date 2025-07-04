@@ -95,7 +95,9 @@ export async function GET(
       "minimal-glass";
     const opacity = searchParams.get("opacity") || "100";
     const radius = searchParams.get("radius") || "12";
-    const statsParam = searchParams.get("stats") || "commits,prs,issues,stars,followers,repos,topLanguage";
+    const statsParam =
+      searchParams.get("stats") ||
+      "commits,prs,issues,stars,followers,repos,topLanguage";
 
     const styles = themeStyles[theme];
     const githubService = new GitHubService();
@@ -113,7 +115,10 @@ export async function GET(
       prs: { label: "PRs", value: stats.prs.toLocaleString() },
       issues: { label: "Issues", value: stats.issues?.toLocaleString() || "0" },
       stars: { label: "Stars", value: stats.stars.toLocaleString() },
-      followers: { label: "Followers", value: stats.followers?.toLocaleString() || "0" },
+      followers: {
+        label: "Followers",
+        value: stats.followers?.toLocaleString() || "0",
+      },
       repos: { label: "Repos", value: stats.repositories.toLocaleString() },
       topLanguage: { label: "Top Lang", value: topLanguage },
     };
@@ -131,7 +136,9 @@ export async function GET(
       return { width: 520, height: 240 };
     };
 
-    const { width: cardWidth, height: cardHeight } = getCardDimensions(statData.length);
+    const { width: cardWidth, height: cardHeight } = getCardDimensions(
+      statData.length
+    );
     const padding = 20;
 
     // Header section
@@ -180,7 +187,9 @@ export async function GET(
           <!-- Stat label -->
           <text x="${x + statWidth / 2}" y="${y + 36}" 
                 text-anchor="middle" font-size="10" font-weight="400" 
-                fill="${styles.textSecondary}" opacity="0.8">${stat.label}</text>
+                fill="${styles.textSecondary}" opacity="0.8">${
+          stat.label
+        }</text>
         </g>
       `;
       })
@@ -189,11 +198,16 @@ export async function GET(
     // Create gradient definitions
     const createGradientDefs = () => {
       if (!styles.isGradient) return "";
-      
-      const gradientId = theme === "gradient-pro" ? "gradientProBg" : "synthwaveBg";
-      const stops = styles.gradientStops?.map(stop => 
-        `<stop offset="${stop.offset}" stop-color="${stop.color}" />`
-      ).join("\n") || "";
+
+      const gradientId =
+        theme === "gradient-pro" ? "gradientProBg" : "synthwaveBg";
+      const stops =
+        styles.gradientStops
+          ?.map(
+            (stop) =>
+              `<stop offset="${stop.offset}" stop-color="${stop.color}" />`
+          )
+          .join("\n") || "";
 
       return `
         <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -201,6 +215,7 @@ export async function GET(
         </linearGradient>
       `;
     };
+    const avatarBase64 = await fetchBase64Image(stats.avatar_url);
 
     const svg = `
 <svg width="${cardWidth}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}" xmlns="http://www.w3.org/2000/svg">
@@ -228,7 +243,9 @@ export async function GET(
       <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="rgba(0,0,0,0.1)"/>
     </filter>
     <clipPath id="avatarClip">
-      <circle cx="${avatarX + avatarSize / 2}" cy="${avatarY + avatarSize / 2}" r="${avatarSize / 2}" />
+      <circle cx="${avatarX + avatarSize / 2}" cy="${
+      avatarY + avatarSize / 2
+    }" r="${avatarSize / 2}" />
     </clipPath>
     ${createGradientDefs()}
   </defs>
@@ -236,24 +253,31 @@ export async function GET(
   <!-- Card background -->
   <rect width="100%" height="100%" rx="${radius}" 
         fill="${styles.background}" 
-        stroke="${styles.border.replace('1px solid ', '')}" 
+        stroke="${styles.border.replace("1px solid ", "")}" 
         fill-opacity="${parseInt(opacity) / 100}"
         filter="url(#shadow)" />
 
   <!-- Avatar with border -->
-  <circle cx="${avatarX + avatarSize / 2}" cy="${avatarY + avatarSize / 2}" r="${avatarSize / 2 + 1}" 
+  <circle cx="${avatarX + avatarSize / 2}" cy="${
+      avatarY + avatarSize / 2
+    }" r="${avatarSize / 2 + 1}" 
           fill="none" stroke="${styles.avatarBorder}" stroke-width="2" />
   
   <!-- Avatar image -->
-  <image href="${stats.avatar_url}" x="${avatarX}" y="${avatarY}" 
-         width="${avatarSize}" height="${avatarSize}" 
-         clip-path="url(#avatarClip)" />
+  <image href="${avatarBase64 || stats.avatar_url}" x="${avatarX}" y="${avatarY}" 
+       width="${avatarSize}" height="${avatarSize}" 
+       clip-path="url(#avatarClip)" />
+
 
   <!-- User info -->
-  <text x="${nameX}" y="${nameY}" class="card-title" fill="${styles.textPrimary}">
+  <text x="${nameX}" y="${nameY}" class="card-title" fill="${
+      styles.textPrimary
+    }">
     ${stats.name || stats.login}
   </text>
-  <text x="${nameX}" y="${usernameY}" class="card-subtitle" fill="${styles.textSecondary}" opacity="0.8">
+  <text x="${nameX}" y="${usernameY}" class="card-subtitle" fill="${
+      styles.textSecondary
+    }" opacity="0.8">
     @${stats.login}
   </text>
 
@@ -274,6 +298,18 @@ export async function GET(
       status: 500,
       headers: { "Content-Type": "image/svg+xml" },
     });
+  }
+}
+async function fetchBase64Image(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url);
+    const buffer = await response.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    const mimeType = response.headers.get("content-type") || "image/jpeg";
+    return `data:${mimeType};base64,${base64}`;
+  } catch (e) {
+    console.error("Failed to fetch avatar image:", e);
+    return null;
   }
 }
 
